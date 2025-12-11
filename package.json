@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "type": "module",
-  "scripts": {
+
+
+    "scripts": {
+    "start": "node prismaserver.js",
     "dev": "node prismaserver.js"
   },
   "keywords": [],

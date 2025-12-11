@@ -1,110 +1,125 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  schemas = ["public", "practice"]
 }
 
 model staff {
-  id     Int    @id @default(autoincrement())
-  name   String
-  age    Int
-  salary Int
-  email  String?  
+  id         Int     @id @default(autoincrement())
+  name       String
+  age        Int
+  salary     Int
+  email      String?
   department String?
 
-  @@map("staff") 
+  @@map("staff")
+  @@schema("public")
 }
+
 model Category {
-  CategoryID    Int        @id @default(autoincrement()) @map("CategoryID")
-  CategoryName  String     @map("CategoryName")
-  // Relations
-  products      Product[]
+  CategoryID   Int       @id @default(autoincrement()) @map("CategoryID")
+  CategoryName String    @map("CategoryName")
+  products     Product[]
+
   @@map("Categories")
+  @@schema("public")
 }
 
 model Product {
-  ProductID       Int        @id @default(autoincrement()) @map("ProductID")
-  Name            String     @map("Name")
-  Description     String?    @map("Description")
-  Price           Decimal    @map("Price")
-  StockQuantity   Int        @default(0) @map("StockQuantity")
-  CreatedAt       DateTime   @default(now()) @map("CreatedAt")
-
-  // FK
-  CategoryID      Int?       @map("CategoryID")
-  category        Category?  @relation(fields: [CategoryID], references: [CategoryID], onUpdate: Cascade, onDelete: SetNull)
-
-  // Relations
-  orderItems      OrderItem[]
+  ProductID     Int         @id @default(autoincrement()) @map("ProductID")
+  Name          String      @map("Name")
+  Description   String?     @map("Description")
+  Price         Decimal     @map("Price")
+  StockQuantity Int         @default(0) @map("StockQuantity")
+  CreatedAt     DateTime    @default(now()) @map("CreatedAt")
+  CategoryID    Int?        @map("CategoryID")
+  orderItems    OrderItem[]
+  category      Category?   @relation(fields: [CategoryID], references: [CategoryID])
 
   @@map("Products")
+  @@schema("public")
 }
 
 model User {
-  UserID        Int        @id @default(autoincrement()) @map("UserID")
-  Username      String     @map("Username")
-  Email         String     @unique @map("Email")
-  PasswordHash  String     @map("PasswordHash")
-  Address       String?    @map("Address")
-  Phone         String?    @map("Phone")
-
-  // Relations
-  orders        Order[]
+  UserID       Int     @id @default(autoincrement()) @map("UserID")
+  Username     String  @map("Username")
+  Email        String  @unique @map("Email")
+  PasswordHash String  @map("PasswordHash")
+  Address      String? @map("Address")
+  Phone        String? @map("Phone")
+  orders       Order[]
 
   @@map("Users")
+  @@schema("public")
 }
 
 model Order {
-  OrderID      Int        @id @default(autoincrement()) @map("OrderID")
-  TotalAmount  Decimal    @map("TotalAmount")
-  Status       String     @default("pending") @map("Status")
-  CreatedAt    DateTime   @default(now()) @map("CreatedAt")
-
-  // FK
-  UserID       Int        @map("UserID")
-  user         User       @relation(fields: [UserID], references: [UserID], onUpdate: Cascade, onDelete: Cascade)
-
-  // Relations
-  items        OrderItem[]
-  payments     Payment[]
+  OrderID     Int         @id @default(autoincrement()) @map("OrderID")
+  TotalAmount Decimal     @map("TotalAmount")
+  Status      String      @default("pending") @map("Status")
+  CreatedAt   DateTime    @default(now()) @map("CreatedAt")
+  UserID      Int         @map("UserID")
+  items       OrderItem[]
+  user        User        @relation(fields: [UserID], references: [UserID], onDelete: Cascade)
+  payments    Payment[]
 
   @@map("Orders")
+  @@schema("public")
 }
 
 model OrderItem {
-  OrderItemID       Int       @id @default(autoincrement()) @map("OrderItemID")
-  Quantity          Int       @map("Quantity")
-  PriceAtPurchase   Decimal   @map("PriceAtPurchase")
-
-  // FK
-  OrderID           Int       @map("OrderID")
-  order             Order     @relation(fields: [OrderID], references: [OrderID], onUpdate: Cascade, onDelete: Cascade)
-
-  ProductID         Int       @map("ProductID")
-  product           Product   @relation(fields: [ProductID], references: [ProductID], onUpdate: Cascade, onDelete: Cascade)
+  OrderItemID     Int     @id @default(autoincrement()) @map("OrderItemID")
+  Quantity        Int     @map("Quantity")
+  PriceAtPurchase Decimal @map("PriceAtPurchase")
+  OrderID         Int     @map("OrderID")
+  ProductID       Int     @map("ProductID")
+  order           Order   @relation(fields: [OrderID], references: [OrderID], onDelete: Cascade)
+  product         Product @relation(fields: [ProductID], references: [ProductID], onDelete: Cascade)
 
   @@map("OrderItems")
+  @@schema("public")
 }
 
-
 model Payment {
-  PaymentID            Int       @id @default(autoincrement()) @map("PaymentID")
-  Amount               Decimal   @map("Amount")
-  Method               String    @map("Method")
-  Status               String    @default("pending") @map("Status")
-  TransactionReference String?   @map("TransactionReference")
-  CreatedAt            DateTime  @default(now()) @map("CreatedAt")
-
-  // FK
-  OrderID              Int       @map("OrderID")
-  order                Order     @relation(fields: [OrderID], references: [OrderID], onUpdate: Cascade, onDelete: Cascade)
+  PaymentID            Int      @id @default(autoincrement()) @map("PaymentID")
+  Amount               Decimal  @map("Amount")
+  Method               String   @map("Method")
+  Status               String   @default("pending") @map("Status")
+  TransactionReference String?  @map("TransactionReference")
+  CreatedAt            DateTime @default(now()) @map("CreatedAt")
+  OrderID              Int      @map("OrderID")
+  order                Order    @relation(fields: [OrderID], references: [OrderID], onDelete: Cascade)
 
   @@map("Payments")
+  @@schema("public")
+}
+
+model employees {
+  id     Int      @id @default(autoincrement())
+  name   String?  @db.VarChar(100)
+  age    Int?
+  salary Decimal? @db.Decimal(10, 2)
+
+  @@schema("public")
+}
+
+model student {
+  id    Int     @id @default(autoincrement())
+  name  String? @db.VarChar(100)
+  grade Int
+
+  @@map("pupils")
+  @@schema("public")
+}
+
+model department{
+  id    Int     @id @default(autoincrement())
+  names  String? @db.VarChar(100)
+  totalstudents Int
+
+  @@map("departments")
+  @@schema("practice")
 }

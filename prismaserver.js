@@ -73,4 +73,18 @@ app.delete("/staff/:id", async (req, res) => {
   res.json({ message: "Deleted" });
 });
 
+app.get("/staff/group/department", async (req, res) => {
+  try {
+    const grouped = await prisma.staff.groupBy({
+      by: ["department"], 
+      _count: { id: true },  
+      _avg: { salary: true }, 
+    });
+
+    res.json(grouped);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 app.listen(3000, () => console.log("Server running on port 3000"));
