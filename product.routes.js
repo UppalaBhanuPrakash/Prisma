@@ -147,53 +147,172 @@ const router = express.Router();
 //   })
 // })
 
+// router.get("/",async(req,res)=>{
+//   const page=parseInt(req.query.page)||1;
+//   const limit=parseInt(req.query.limit)||10;
+//   const skip=(page-1)*10;
+
+//   const {name,minPrice,maxPrice,category}=req.query;
+
+//   const where={}
+
+//   if(name){
+//     where.Name={
+//       contains:name,
+//       mode:"insensitives"
+//     }
+//   }
+
+//   if(minPrice||maxPrice){
+//     where.Price={}
+//     if(maxPrice)where.Price=parseFloat(minPrice);
+//     if(minPrice)where.Price=parseFloat(maxPrice);
+//   }
+
+//   if(category){
+//     where.category={
+//       CategoryName:{
+//         equals:category,
+//         mode:"insensitive",
+//       }
+//     }
+//   }
+//   const [total,products]=await Promise.all([
+//     prisma.product.count({where}),
+//     prisma.product.findMany({
+//       where,
+//       skip,
+//       take:limit,
+//       orderBy:{ProductID:"asc"},
+//       include:{category:true}
+//     })
+//   ]);
+//   res.json({
+//     page,
+//     limit,
+//     total,
+//     totalPages:Math.ceil(total/limit),
+//     data:products
+//   })
+// })
+
+// router.get("/", async (req, res) => {
+//   const page = parseInt(req.query.page) || 1;
+//   const limit = parseInt(req.query.limit) || 10;
+//   const skip = (page - 1) * limit;
+
+//   const { name, minPrice, maxPrice, category } = req.query;
+
+//   const where = {};
+
+//   if (name) {
+//     where.Name = { contains: name, mode: "insensitive" };
+//   }
+
+//   if (minPrice || maxPrice) {
+//     where.Price = {};
+//     if (minPrice) where.Price.gte = parseFloat(minPrice);
+//     if (maxPrice) where.Price.lte = parseFloat(maxPrice);
+//   }
+
+//   if (category) {
+//     where.category = {
+//       is: {
+//         CategoryName: { equals: category, mode: "insensitive" },
+//       },
+//     };
+//   }
+
+//   const [total, products] = await Promise.all([
+//     prisma.product.count({ where }),
+//     prisma.product.findMany({
+//       where,
+//       skip,
+//       take: limit,
+//       orderBy: { ProductID: "asc" },
+//       include: { category: true },
+//     }),
+//   ]);
+
+//   // TRANSFORM RESPONSE KEYS HERE
+//   const formattedProducts = products.map((p) => ({
+//     productId: p.ProductID,
+//     productName: p.Name,
+//     description: p.Description,
+//     price: p.Price,
+//     stock: p.StockQuantity,
+//     categoryName: p.category?.CategoryName,
+//     createdAt: p.CreatedAt,
+//   }));
+
+//   res.json({
+//     page,
+//     limit,
+//     total,
+//     totalPages: Math.ceil(total / limit),
+//     data: formattedProducts,
+//   });
+// });
+
+// router.get("/",async(req,res)=>{
+//   const product=await prisma.product.findMany({
+//    orderBy:{
+//     Price:'desc'
+//    },take:5
+//   })
+//   res.json(product)
+// })
+// router.get("/",async(req,res)=>{
+//   const product=await prisma.product.findMany({
+//     where:{
+//       StockQuantity:{
+//         equals:1
+//       }
+//     }
+//   })
+//   res.json(product)
+// })
+
+// router.get("/",async(req,res)=>{
+//   const product=await prisma.product.findMany({
+//     where:{
+//       category:{
+//         CategoryName:"Electronics"
+//       }
+//     },
+//     include:{
+//       category:true
+//     }
+//   })
+//   res.json(product)
+// })
+
+// router.get("/",async(req,res)=>{
+//   const product=await prisma.category.findMany({
+//     select:{
+//       CategoryID:true,
+//       CategoryName:true,
+//       _count:{
+//         select:{
+//           products:true
+//         }
+//       }
+//     }
+//   })
+//   res.json(product)
+// })
+
 router.get("/",async(req,res)=>{
-  const page=parseInt(req.query.page)||1;
-  const limit=parseInt(req.query.limit)||10;
-  const skip=(page-1)*10;
-
-  const {name,minPrice,maxPrice,category}=req.query;
-
-  const where={}
-
-  if(name){
-    where.Name={
-      contains:name,
-      mode:"insensitives"
-    }
-  }
-
-  if(minPrice||maxPrice){
-    where.Price={}
-    if(maxPrice)where.Price=parseFloat(minPrice);
-    if(minPrice)where.Price=parseFloat(maxPrice);
-  }
-
-  if(category){
-    where.category={
-      CategoryName:{
-        equals:category,
-        mode:"insensitive",
+  const product=await prisma.category.findMany({
+    include:{
+      _count:{
+        select:{
+          products:true
+        }
       }
     }
-  }
-  const [total,products]=await Promise.all([
-    prisma.product.count({where}),
-    prisma.product.findMany({
-      where,
-      skip,
-      take:limit,
-      orderBy:{ProductID:"asc"},
-      include:{category:true}
-    })
-  ]);
-  res.json({
-    page,
-    limit,
-    total,
-    totalPages:Math.ceil(total/limit),
-    data:products
   })
+  res.json(product)
 })
 // CREATE PRODUCT
 router.post("/", async (req, res) => {
